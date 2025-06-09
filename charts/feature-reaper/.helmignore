@@ -1,0 +1,5 @@
+# Patterns to ignore when packaging Helm charts.
+*.tgz
+*.tar.gz
+*.swp
+.DS_Store
