@@ -1,0 +1,1 @@
+A golang program that runs once and then exits. When it runs it looks at all namespaces in the cluster with labels.isFeature=true where annotations.updatedAt (formatted in 20060102150405) is more than 72 hours ago - then deletes them without waiting for confirmation.
