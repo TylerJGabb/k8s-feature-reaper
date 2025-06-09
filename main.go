@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"flag"
 	"fmt"
 	"log"
 	"time"
@@ -16,8 +17,9 @@ const (
 	labelSelector = "isFeature=true"
 	updatedAtKey  = "updatedAt"
 	timeLayout    = "20060102150405"
-	maxAge        = 72 * time.Hour
 )
+
+var maxAge = flag.Duration("max-age", 72*time.Hour, "maximum age of a namespace before deletion")
 
 func buildConfig() (*rest.Config, error) {
 	// Try in-cluster config first
@@ -34,6 +36,7 @@ func buildConfig() (*rest.Config, error) {
 }
 
 func main() {
+	flag.Parse()
 	ctx := context.Background()
 	config, err := buildConfig()
 	if err != nil {
@@ -65,7 +68,7 @@ func main() {
 			log.Printf("namespace %s has invalid updatedAt: %v", ns.Name, err)
 			continue
 		}
-		if now.Sub(ts) > maxAge {
+		if now.Sub(ts) > *maxAge {
 			if err := clientset.CoreV1().Namespaces().Delete(ctx, ns.Name, metav1.DeleteOptions{}); err != nil {
 				log.Printf("failed to delete namespace %s: %v", ns.Name, err)
 			} else {

@@ -64,7 +64,7 @@ metadata:
 
 	t.Logf("✅ Namespaces created successfully.")
 	t.Logf("⏳ Running the reaper to clean up old namespaces...")
-	if out, err := exec.Command("go", "run", ".").CombinedOutput(); err != nil {
+	if out, err := exec.Command("go", "run", ".", "--max-age=72h").CombinedOutput(); err != nil {
 		t.Fatalf("failed to run reaper: %v\n%s", err, out)
 	} else {
 		t.Logf("reaper output:\n%s", out)

@@ -16,3 +16,4 @@ helm install feature-reaper ./feature-reaper
 | `image.tag` | Image tag | `latest` |
 | `image.pullPolicy` | Kubernetes image pull policy | `IfNotPresent` |
 | `schedule` | Cron schedule for the job | `"0 * * * *"` |
+| `maxAge` | Duration before a namespace is eligible for deletion | `72h` |
