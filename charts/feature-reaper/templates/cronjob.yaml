@@ -13,3 +13,5 @@ spec:
             - name: feature-reaper
               image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
               imagePullPolicy: {{ .Values.image.pullPolicy }}
+              args:
+                - --max-age={{ .Values.maxAge }}

@@ -3,3 +3,4 @@ image:
   tag: latest
   pullPolicy: IfNotPresent
 schedule: "0 * * * *"
+maxAge: 72h
