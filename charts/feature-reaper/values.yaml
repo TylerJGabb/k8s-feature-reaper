@@ -1,6 +1,3 @@
-image:
-  repository: ghcr.io/example/feature-reaper
-  tag: latest
-  pullPolicy: IfNotPresent
+image: placeholder
 schedule: "0 * * * *"
 maxAge: 72h
