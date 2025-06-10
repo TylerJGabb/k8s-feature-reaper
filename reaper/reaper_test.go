@@ -23,7 +23,7 @@ func TestReapNamespaces(t *testing.T) {
 		ObjectMeta: metav1.ObjectMeta{
 			Name: "ns-old",
 			Labels: map[string]string{
-				"isFeature": "true",
+				reaper.IS_FEATURE_KEY: "true",
 			},
 			Annotations: map[string]string{
 				reaper.UPDATED_AT_KEY: oldTS,
@@ -34,7 +34,7 @@ func TestReapNamespaces(t *testing.T) {
 		ObjectMeta: metav1.ObjectMeta{
 			Name: "ns-new",
 			Labels: map[string]string{
-				"isFeature": "true",
+				reaper.IS_FEATURE_KEY: "true",
 			},
 			Annotations: map[string]string{
 				reaper.UPDATED_AT_KEY: newTS,
