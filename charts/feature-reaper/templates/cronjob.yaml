@@ -1,6 +1,7 @@
 apiVersion: batch/v1
 kind: CronJob
 metadata:
+  namespace: {{ .Release.Namespace }}
   name: feature-reaper
 spec:
   schedule: {{ .Values.schedule | quote }}
@@ -8,10 +9,11 @@ spec:
     spec:
       template:
         spec:
+          serviceAccountName: feature-reaper-sa
           restartPolicy: Never
           containers:
             - name: feature-reaper
-              image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
-              imagePullPolicy: {{ .Values.image.pullPolicy }}
+              image: {{ .Values.image }}
+              imagePullPolicy: IfNotPresent
               args:
                 - --max-age={{ .Values.maxAge }}
