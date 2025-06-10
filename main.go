@@ -48,12 +48,17 @@ func main() {
 		log.Fatalf("failed to create clientset: %v", err)
 	}
 
-	namespaces, err := clientset.CoreV1().Namespaces().List(ctx, metav1.ListOptions{LabelSelector: labelSelector})
+	if err := reapNamespaces(ctx, clientset, *maxAge, time.Now()); err != nil {
+		log.Fatalf("failed to reap namespaces: %v", err)
+	}
+}
+
+func reapNamespaces(ctx context.Context, client kubernetes.Interface, maxAge time.Duration, now time.Time) error {
+	namespaces, err := client.CoreV1().Namespaces().List(ctx, metav1.ListOptions{LabelSelector: labelSelector})
 	if err != nil {
-		log.Fatalf("failed to list namespaces: %v", err)
+		return err
 	}
 
-	now := time.Now()
 	for _, ns := range namespaces.Items {
 		ann := ns.Annotations
 		if ann == nil {
@@ -68,12 +73,13 @@ func main() {
 			log.Printf("namespace %s has invalid updatedAt: %v", ns.Name, err)
 			continue
 		}
-		if now.Sub(ts) > *maxAge {
-			if err := clientset.CoreV1().Namespaces().Delete(ctx, ns.Name, metav1.DeleteOptions{}); err != nil {
+		if now.Sub(ts) > maxAge {
+			if err := client.CoreV1().Namespaces().Delete(ctx, ns.Name, metav1.DeleteOptions{}); err != nil {
 				log.Printf("failed to delete namespace %s: %v", ns.Name, err)
 			} else {
 				fmt.Printf("deleted namespace %s\n", ns.Name)
 			}
 		}
 	}
+	return nil
 }
