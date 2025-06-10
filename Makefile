@@ -31,3 +31,7 @@ unit-test:
 	go clean -testcache
 	go test -v ./... -coverprofile=coverage.out -covermode=atomic
 
+.phony: integration-test
+integration-test:
+	./integration-test.sh
+
