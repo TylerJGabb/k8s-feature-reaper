@@ -1,21 +1,23 @@
-package main
+package reaper_test
 
 import (
 	"context"
 	"testing"
 	"time"
 
+	"k8s-feature-reaper/reaper"
+
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes/fake"
 )
 
-func TestReaperWithFakeClient(t *testing.T) {
+func TestReapNamespaces(t *testing.T) {
 	ctx := context.Background()
 	client := fake.NewSimpleClientset()
 
-	oldTS := time.Now().Add(-73 * time.Hour).Format(timeLayout)
-	newTS := time.Now().Add(-1 * time.Hour).Format(timeLayout)
+	oldTS := time.Now().Add(-73 * time.Hour).Format(reaper.TIME_LAYOUT)
+	newTS := time.Now().Add(-1 * time.Hour).Format(reaper.TIME_LAYOUT)
 
 	oldNs := &v1.Namespace{
 		ObjectMeta: metav1.ObjectMeta{
@@ -24,7 +26,7 @@ func TestReaperWithFakeClient(t *testing.T) {
 				"isFeature": "true",
 			},
 			Annotations: map[string]string{
-				updatedAtKey: oldTS,
+				reaper.UPDATED_AT_KEY: oldTS,
 			},
 		},
 	}
@@ -35,7 +37,7 @@ func TestReaperWithFakeClient(t *testing.T) {
 				"isFeature": "true",
 			},
 			Annotations: map[string]string{
-				updatedAtKey: newTS,
+				reaper.UPDATED_AT_KEY: newTS,
 			},
 		},
 	}
@@ -47,7 +49,7 @@ func TestReaperWithFakeClient(t *testing.T) {
 		t.Fatalf("failed to create new ns: %v", err)
 	}
 
-	if err := reapNamespaces(ctx, client, 72*time.Hour, time.Now()); err != nil {
+	if err := reaper.ReapNamespaces(ctx, client, 72*time.Hour, time.Now()); err != nil {
 		t.Fatalf("reapNamespaces returned error: %v", err)
 	}
 
