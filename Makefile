@@ -15,3 +15,8 @@ build-docker:
 load: build-docker
 	kind load docker-image feature-reaper:latest
 
+.phony: unit-test
+unit-test:
+	go clean -testcache
+	go test -v ./... -coverprofile=coverage.out -covermode=atomic
+
