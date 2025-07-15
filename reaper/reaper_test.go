@@ -42,11 +42,20 @@ func TestReapNamespaces(t *testing.T) {
 		},
 	}
 
+	unrelatedNs := &v1.Namespace{
+		ObjectMeta: metav1.ObjectMeta{
+			Name: "ns-unrelated",
+		},
+	}
+
 	if _, err := client.CoreV1().Namespaces().Create(ctx, oldNs, metav1.CreateOptions{}); err != nil {
 		t.Fatalf("failed to create old ns: %v", err)
 	}
 	if _, err := client.CoreV1().Namespaces().Create(ctx, newNs, metav1.CreateOptions{}); err != nil {
 		t.Fatalf("failed to create new ns: %v", err)
+	}
+	if _, err := client.CoreV1().Namespaces().Create(ctx, unrelatedNs, metav1.CreateOptions{}); err != nil {
+		t.Fatalf("failed to create unrelated ns: %v", err)
 	}
 
 	if err := reaper.ReapNamespaces(ctx, client, 72*time.Hour, time.Now()); err != nil {
@@ -57,13 +66,15 @@ func TestReapNamespaces(t *testing.T) {
 	if err != nil {
 		t.Fatalf("failed to list namespaces: %v", err)
 	}
-	foundOld, foundNew := false, false
+	foundOld, foundNew, foundUnrelated := false, false, false
 	for _, ns := range nsList.Items {
 		switch ns.Name {
 		case "ns-old":
 			foundOld = true
 		case "ns-new":
 			foundNew = true
+		case "ns-unrelated":
+			foundUnrelated = true
 		}
 	}
 	if foundOld {
@@ -71,5 +82,8 @@ func TestReapNamespaces(t *testing.T) {
 	}
 	if !foundNew {
 		t.Fatalf("expected ns-new to exist")
+	}
+	if !foundUnrelated {
+		t.Fatalf("expected ns-unrelated to exist")
 	}
 }
